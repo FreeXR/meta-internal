@@ -2,3 +2,8 @@
 *.txt
 *.dex
 *.class
+*.dex
+*.bin
+*.properties
+*.lock
+*.bin

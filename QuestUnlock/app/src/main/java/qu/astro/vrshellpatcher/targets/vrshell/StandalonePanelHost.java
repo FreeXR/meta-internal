@@ -28,8 +28,8 @@ import qu.astro.vrshellpatcher.util.Logx;
 import qu.astro.vrshellpatcher.util.State;
 
 /**
- * Safer standalone host for the Debug Panel. Avoids onWindowFocusChanged on the Dogfood class
- * directly; instead hook base Activity.onWindowFocusChanged/onResume and only react for Dogfood.
+ * Hosts ShellDebugPanelApp inside DogfoodMainActivity *without* relying on
+ * Dogfood lifecycle peculiarities. Also sets a clean title.
  */
 public final class StandalonePanelHost {
     private StandalonePanelHost(){}
@@ -54,7 +54,7 @@ public final class StandalonePanelHost {
                 State.debugPanelCtor = debugCls.getConstructors()[0];
             }
 
-            // Dogfood onCreate – stash activity + decor, inject panel
+            // Dogfood onCreate – host the debug panel view and set sane title
             XposedHelpers.findAndHookMethod(
                     DogfoodActivity, lpp.classLoader, "onCreate",
                     Bundle.class,
@@ -67,7 +67,6 @@ public final class StandalonePanelHost {
                             registerKillReceiver(activity);
 
                             boolean wantStandalone = wantsStandaloneDebug(activity.getIntent());
-                            Logx.debug("[IE] wantStandalone=" + wantStandalone);
                             State.inDogfoodStandalone = wantStandalone;
                             if (!wantStandalone) return;
 
@@ -82,46 +81,31 @@ public final class StandalonePanelHost {
                                 if (mv instanceof View) {
                                     View v = (View) mv;
                                     if (v.getParent() instanceof ViewGroup) {
-                                        Logx.debug("[IE] Detached mMainView from previous parent");
                                         ((ViewGroup) v.getParent()).removeView(v);
                                     }
                                     v.setLayoutParams(new ViewGroup.LayoutParams(
                                             ViewGroup.LayoutParams.MATCH_PARENT,
                                             ViewGroup.LayoutParams.MATCH_PARENT));
                                     activity.setContentView(v);
+                                    activity.setTitle("VR Shell Debug Panel"); // <- fixed title
                                     State.lastDecor = activity.getWindow() != null ? activity.getWindow().getDecorView() : null;
-                                    Logx.debug("[IE] Injected mMainView; decorAttached=" + (State.lastDecor!=null && State.lastDecor.isAttachedToWindow()));
-                                    activity.setTitle("Debug Panel");
                                 }
                             } catch (Throwable t) { Logx.exc("Inject mainView failed", t); }
                         }
                     });
 
-            // Base Activity hooks → keep freshest decor/token without assuming Dogfood method presence
+            // Base Activity hooks → keep freshest decor/token
             XposedHelpers.findAndHookMethod(Activity.class, "onResume", new XC_MethodHook() {
                 @Override protected void afterHookedMethod(MethodHookParam param) {
                     Activity a = (Activity) param.thisObject;
                     if (a.getClass().getName().equals(DogfoodActivity)) {
                         State.lastActivity = a;
                         State.lastDecor = (a.getWindow()!=null) ? a.getWindow().getDecorView() : null;
-                        Logx.debug("[IE] Focus update → decor=" + (State.lastDecor!=null) +
-                                ", attached=" + (State.lastDecor!=null && State.lastDecor.isAttachedToWindow()));
-                    }
-                }
-            });
-            XposedHelpers.findAndHookMethod(Activity.class, "onWindowFocusChanged", boolean.class, new XC_MethodHook() {
-                @Override protected void afterHookedMethod(MethodHookParam param) {
-                    Activity a = (Activity) param.thisObject;
-                    if (a.getClass().getName().equals(DogfoodActivity)) {
-                        State.lastActivity = a;
-                        State.lastDecor = (a.getWindow()!=null) ? a.getWindow().getDecorView() : null;
-                        Logx.debug("[IE] Focus update → decor=" + (State.lastDecor!=null) +
-                                ", attached=" + (State.lastDecor!=null && State.lastDecor.isAttachedToWindow()));
                     }
                 }
             });
 
-            // Dogfood onDestroy cleanup
+            // Dogfood onDestroy cleanup; avoid double finish side effects
             try {
                 XposedHelpers.findAndHookMethod(
                         DogfoodActivity, lpp.classLoader, "onDestroy",
@@ -135,6 +119,7 @@ public final class StandalonePanelHost {
                         });
             } catch (Throwable ignored) {}
 
+            Logx.debug("[IE] StandalonePanelHost installed");
         } catch (Throwable t) {
             Logx.exc("StandalonePanelHost.install failed", t);
         }
@@ -145,11 +130,13 @@ public final class StandalonePanelHost {
             IntentFilter f = new IntentFilter(ACTION_KILL_DOGFOOD);
             dogfood.registerReceiver(new BroadcastReceiver() {
                 @Override public void onReceive(Context context, Intent intent) {
-                    Logx.debug("[IE] Kill broadcast received → finishing DogfoodActivity");
-                    try { dogfood.finish(); } catch (Throwable ignored) {}
+                    try {
+                        if (!dogfood.isFinishing() && !dogfood.isDestroyed()) {
+                            dogfood.finish();
+                        }
+                    } catch (Throwable ignored) {}
                 }
             }, f);
-            Logx.debug("[IE] Kill receiver registered for ACTION " + ACTION_KILL_DOGFOOD);
         } catch (Throwable t) {
             Logx.exc("[IE] registerKillReceiver", t);
         }

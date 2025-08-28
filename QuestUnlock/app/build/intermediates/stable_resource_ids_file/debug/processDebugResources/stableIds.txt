@@ -1,0 +1,16 @@
+qu.astro.vrshellpatcher.debug:xml/data_extraction_rules = 0x7f060001
+qu.astro.vrshellpatcher.debug:xml/backup_rules = 0x7f060000
+qu.astro.vrshellpatcher.debug:string/app_name = 0x7f050000
+qu.astro.vrshellpatcher.debug:mipmap/ic_launcher_round = 0x7f040001
+qu.astro.vrshellpatcher.debug:mipmap/ic_launcher = 0x7f040000
+qu.astro.vrshellpatcher.debug:drawable/ic_launcher_foreground = 0x7f030002
+qu.astro.vrshellpatcher.debug:drawable/$ic_launcher_foreground__0 = 0x7f030000
+qu.astro.vrshellpatcher.debug:color/white = 0x7f020006
+qu.astro.vrshellpatcher.debug:color/teal_700 = 0x7f020005
+qu.astro.vrshellpatcher.debug:color/purple_200 = 0x7f020001
+qu.astro.vrshellpatcher.debug:drawable/ic_launcher_background = 0x7f030001
+qu.astro.vrshellpatcher.debug:color/teal_200 = 0x7f020004
+qu.astro.vrshellpatcher.debug:color/purple_700 = 0x7f020003
+qu.astro.vrshellpatcher.debug:color/purple_500 = 0x7f020002
+qu.astro.vrshellpatcher.debug:color/black = 0x7f020000
+qu.astro.vrshellpatcher.debug:array/xposedscope = 0x7f010000

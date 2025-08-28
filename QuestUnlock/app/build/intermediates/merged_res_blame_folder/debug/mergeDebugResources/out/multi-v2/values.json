@@ -1,0 +1,62 @@
+{
+    "logs": [
+        {
+            "outputFile": "qu.astro.vrshellpatcher.app-mergeDebugResources-2:/values/values.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\xAstroBoy\\Desktop\\Quest Stuff\\QuestUnlock\\app\\src\\main\\res\\values\\strings.xml",
+                    "from": {
+                        "startLines": "1",
+                        "startColumns": "4",
+                        "startOffsets": "17",
+                        "endColumns": "52",
+                        "endOffsets": "65"
+                    },
+                    "to": {
+                        "startLines": "14",
+                        "startColumns": "4",
+                        "startOffsets": "550",
+                        "endColumns": "52",
+                        "endOffsets": "598"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\xAstroBoy\\Desktop\\Quest Stuff\\QuestUnlock\\app\\src\\main\\res\\values\\arrays.xml",
+                    "from": {
+                        "startLines": "1",
+                        "startColumns": "4",
+                        "startOffsets": "17",
+                        "endLines": "5",
+                        "endColumns": "19",
+                        "endOffsets": "196"
+                    },
+                    "to": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "6",
+                        "endColumns": "19",
+                        "endOffsets": "230"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\xAstroBoy\\Desktop\\Quest Stuff\\QuestUnlock\\app\\src\\main\\res\\values\\colors.xml",
+                    "from": {
+                        "startLines": "7,2,3,4,5,6,8",
+                        "startColumns": "4,4,4,4,4,4,4",
+                        "startOffsets": "293,57,105,153,201,247,336",
+                        "endColumns": "41,46,46,46,44,44,41",
+                        "endOffsets": "330,99,147,195,241,287,373"
+                    },
+                    "to": {
+                        "startLines": "7,8,9,10,11,12,13",
+                        "startColumns": "4,4,4,4,4,4,4",
+                        "startOffsets": "235,277,324,371,418,463,508",
+                        "endColumns": "41,46,46,46,44,44,41",
+                        "endOffsets": "272,319,366,413,458,503,545"
+                    }
+                }
+            ]
+        }
+    ]
+}

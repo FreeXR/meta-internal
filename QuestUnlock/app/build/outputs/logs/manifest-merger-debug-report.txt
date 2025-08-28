@@ -1,0 +1,85 @@
+-- Merging decision tree log ---
+manifest
+ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:2:1-33:12
+INJECTED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:2:1-33:12
+INJECTED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:2:1-33:12
+INJECTED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:2:1-33:12
+	package
+		INJECTED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml
+	android:versionName
+		INJECTED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml
+	xmlns:tools
+		ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:3:5-51
+	android:versionCode
+		INJECTED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml
+	xmlns:android
+		ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:2:11-69
+application
+ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:5:5-32:19
+INJECTED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:5:5-32:19
+	android:extractNativeLibs
+		INJECTED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml
+	android:supportsRtl
+		ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:11:9-35
+	android:label
+		ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:9:9-41
+	android:debuggable
+		ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:7:9-34
+	android:roundIcon
+		ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:10:9-54
+	tools:targetApi
+		ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:12:9-29
+	android:icon
+		ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:8:9-43
+	android:allowBackup
+		ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:6:9-35
+meta-data#xposedmodule
+ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:15:9-71
+	android:value
+		ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:15:48-68
+	android:name
+		ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:15:20-47
+meta-data#xposeddescription
+ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:16:9-17:81
+	android:value
+		ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:17:13-78
+	android:name
+		ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:16:20-52
+meta-data#xposedminversion
+ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:18:9-73
+	android:value
+		ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:18:52-70
+	android:name
+		ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:18:20-51
+meta-data#xposedscope
+ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:19:9-87
+	android:resource
+		ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:19:47-84
+	android:name
+		ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:19:20-46
+activity#qu.astro.vrshellpatcher.ui.MainActivity
+ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:22:9-30:20
+	android:label
+		ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:25:13-44
+	android:exported
+		ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:24:13-36
+	android:name
+		ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:23:13-44
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:26:13-29:29
+action#android.intent.action.MAIN
+ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:27:17-69
+	android:name
+		ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:27:25-66
+category#android.intent.category.LAUNCHER
+ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:28:17-77
+	android:name
+		ADDED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml:28:27-74
+uses-sdk
+INJECTED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml
+INJECTED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from C:\Users\xAstroBoy\Desktop\Quest Stuff\QuestUnlock\app\src\main\AndroidManifest.xml

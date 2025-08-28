@@ -14,7 +14,8 @@ import qu.astro.vrshellpatcher.generic.DeviceConfigHooks;
 import qu.astro.vrshellpatcher.app.DebugReceiverMerge;
 import qu.astro.vrshellpatcher.app.AppAttachBroadcast;
 import qu.astro.vrshellpatcher.targets.vrshell.StandalonePanelHost;
-import qu.astro.vrshellpatcher.wm.PopupWindowFixes;
+import qu.astro.vrshellpatcher.wm.PopupWindowHook;
+import qu.astro.vrshellpatcher.wm.DropdownHooks;
 import qu.astro.vrshellpatcher.wm.WindowManagerAddViewHook;
 import qu.astro.vrshellpatcher.util.Logx;
 
@@ -43,8 +44,9 @@ public class MainHook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
         AppAttachBroadcast.install(lpp);
 
         // window/token fixes (scoped by State.inDogfoodStandalone)
-        PopupWindowFixes.install();
-        WindowManagerAddViewHook.install();
+        WindowManagerAddViewHook.install(lpp.classLoader);
+        PopupWindowHook.install(lpp.classLoader);
+        DropdownHooks.install(lpp.classLoader);
 
         // Dogfood standalone host for ShellDebugPanelApp
         StandalonePanelHost.install(lpp);

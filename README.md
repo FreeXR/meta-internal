@@ -80,7 +80,11 @@ This panel contains advanced diagnostics and options normally reserved for inter
 
 ## Contributing
 
-Contributions are welcome to improve module stability or documentation.  
-Focus should remain on **XR system research** and not consumer features.
+Contributions are welcome to improve module stability or documentation, possibly fixing the dropdowns and the blue buttons interactions.
+
+Join FreeXR 
+
+[Discord](https://discord.gg/ABCXxDyqrH)
+(Matrix)[https://matrix.to/#/#quest-rooting:matrix.org]
 
 ---

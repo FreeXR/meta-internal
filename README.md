@@ -85,6 +85,6 @@ Contributions are welcome to improve module stability or documentation, possibly
 Join FreeXR 
 
 [Discord](https://discord.gg/ABCXxDyqrH)
-(Matrix)[https://matrix.to/#/#quest-rooting:matrix.org]
+[Matrix](https://matrix.to/#/#quest-rooting:matrix.org)
 
 ---

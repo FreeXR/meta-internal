@@ -1,7 +1,10 @@
-.gradle/
+**/.gradle/
 *.bin
 *.txt
 *.dex
 *.class
-*.properties
 *.lock
+*.properties
+!**/gradle.properties
+!**/local.properties
+!**/gradle-wrapper.properties

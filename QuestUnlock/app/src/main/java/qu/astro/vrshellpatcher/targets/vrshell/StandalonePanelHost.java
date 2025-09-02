@@ -1,5 +1,9 @@
 package qu.astro.vrshellpatcher.targets.vrshell;
 
+import qu.astro.vrshellpatcher.util.Logx;
+import qu.astro.vrshellpatcher.util.Constants;
+import qu.astro.vrshellpatcher.util.State;
+
 import android.app.Activity;
 import android.app.Application;
 import android.content.BroadcastReceiver;
@@ -21,53 +25,69 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-import qu.astro.vrshellpatcher.util.Logx;
-import qu.astro.vrshellpatcher.util.State;
-
-/**
- * Hosts ShellDebugPanelApp inside DogfoodMainActivity *without* relying on
- * Dogfood lifecycle peculiarities. Also sets a clean title.
- */
 public final class StandalonePanelHost {
     private StandalonePanelHost(){}
 
     private static final String DebugPanelApp   = "com.oculus.panelapp.debug.ShellDebugPanelApp";
     private static final String DogfoodActivity = "com.oculus.panelapp.dogfood.DogfoodMainActivity";
-    public  static final String ACTION_KILL_DOGFOOD = "qu.astro.vrshellpatcher.KILL_DOGFOOD";
 
     public static void install(final XC_LoadPackage.LoadPackageParam lpp) {
         try {
+            // Resolve debug panel class + main view field
             Class<?> debugCls = XposedHelpers.findClass(DebugPanelApp, lpp.classLoader);
             final Field fMainView = XposedHelpers.findField(debugCls, "mMainView");
             fMainView.setAccessible(true);
 
+            // pick preferred ctor (one that takes a Surface), else first available
             for (Constructor<?> c : debugCls.getConstructors()) {
                 Class<?>[] ps = c.getParameterTypes();
                 boolean hasSurface = false;
-                for (Class<?> p : ps) if (Surface.class.isAssignableFrom(p)) { hasSurface = true; break; }
+                for (Class<?> p : ps) { if (Surface.class.isAssignableFrom(p)) { hasSurface = true; break; } }
                 if (hasSurface && ps.length >= 4) { State.debugPanelCtor = c; break; }
             }
             if (State.debugPanelCtor == null && debugCls.getConstructors().length > 0) {
                 State.debugPanelCtor = debugCls.getConstructors()[0];
             }
 
-            // Dogfood onCreate – host the debug panel view and set sane title
+            // Hook onCreate (present in Activity)
             XposedHelpers.findAndHookMethod(
                     DogfoodActivity, lpp.classLoader, "onCreate",
                     Bundle.class,
                     new XC_MethodHook() {
+                        @Override protected void beforeHookedMethod(MethodHookParam param) {
+                            Activity act = (Activity) param.thisObject;
+                            State.lastActivity = act;
+                            State.lastDecor = (act.getWindow()!=null) ? act.getWindow().getDecorView() : null;
+                        }
                         @Override protected void afterHookedMethod(MethodHookParam param) {
                             final Activity activity = (Activity) param.thisObject;
                             State.lastActivity = activity;
                             State.lastDecor = (activity.getWindow()!=null) ? activity.getWindow().getDecorView() : null;
 
-                            registerKillReceiver(activity);
+                            // Register kill receiver bound to this activity instance
+                            try {
+                                BroadcastReceiver killRx = new BroadcastReceiver() {
+                                    @Override public void onReceive(Context c, Intent i) {
+                                        if (Constants.ACTION_KILL_DOGFOOD.equals(i.getAction())) {
+                                            Logx.debug("[IE] Kill broadcast received → finishing DogfoodActivity");
+                                            try { activity.finish(); } catch (Throwable t) { Logx.exc("[IE] finish()", t); }
+                                        }
+                                    }
+                                };
+                                activity.registerReceiver(killRx, new IntentFilter(Constants.ACTION_KILL_DOGFOOD));
+                                XposedHelpers.setAdditionalInstanceField(activity, "QVSP_killRx", killRx);
+                                Logx.debug("[IE] Kill receiver registered for ACTION " + Constants.ACTION_KILL_DOGFOOD);
+                            } catch (Throwable t) {
+                                Logx.exc("[IE] register kill receiver", t);
+                            }
 
                             boolean wantStandalone = wantsStandaloneDebug(activity.getIntent());
                             State.inDogfoodStandalone = wantStandalone;
+                            Logx.debug("[IE] wantStandalone=" + wantStandalone);
                             if (!wantStandalone) return;
 
                             loadPanelLibsOnce(activity.getClassLoader());
@@ -82,63 +102,74 @@ public final class StandalonePanelHost {
                                     View v = (View) mv;
                                     if (v.getParent() instanceof ViewGroup) {
                                         ((ViewGroup) v.getParent()).removeView(v);
+                                        Logx.debug("[IE] Detached mMainView from previous parent");
                                     }
                                     v.setLayoutParams(new ViewGroup.LayoutParams(
                                             ViewGroup.LayoutParams.MATCH_PARENT,
                                             ViewGroup.LayoutParams.MATCH_PARENT));
                                     activity.setContentView(v);
-                                    activity.setTitle("VR Shell Debug Panel"); // <- fixed title
+                                    // refresh decor after setContentView — critical for valid tokens
                                     State.lastDecor = activity.getWindow() != null ? activity.getWindow().getDecorView() : null;
+                                    activity.setTitle("Debug Panel");
+                                    Logx.debug("[IE] Injected mMainView; decorAttached=" +
+                                            (State.lastDecor != null && State.lastDecor.isAttachedToWindow()));
                                 }
                             } catch (Throwable t) { Logx.exc("Inject mainView failed", t); }
                         }
                     });
 
-            // Base Activity hooks → keep freshest decor/token
-            XposedHelpers.findAndHookMethod(Activity.class, "onResume", new XC_MethodHook() {
-                @Override protected void afterHookedMethod(MethodHookParam param) {
-                    Activity a = (Activity) param.thisObject;
-                    if (a.getClass().getName().equals(DogfoodActivity)) {
+            // >>> REPLACE exact hook with GLOBAL hook filtered to Dogfood
+            final Class<?> dogfoodCls = XposedHelpers.findClass(DogfoodActivity, lpp.classLoader);
+
+            // Global Activity.onWindowFocusChanged — update decor when Dogfood gains focus
+            XposedBridge.hookAllMethods(Activity.class, "onWindowFocusChanged", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam p) {
+                    try {
+                        Object thiz = p.thisObject;
+                        if (thiz == null || !dogfoodCls.isInstance(thiz)) return;
+                        boolean hasFocus = (boolean) p.args[0];
+                        if (!hasFocus) return;
+                        Activity a = (Activity) thiz;
                         State.lastActivity = a;
-                        State.lastDecor = (a.getWindow()!=null) ? a.getWindow().getDecorView() : null;
+                        State.lastDecor = (a.getWindow() != null) ? a.getWindow().getDecorView() : null;
+                        Logx.debug("[IE] Focus update → decor=" + (State.lastDecor != null) + ", attached=" +
+                                (State.lastDecor != null && State.lastDecor.isAttachedToWindow()));
+                    } catch (Throwable t) { Logx.exc("[IE] global onWindowFocusChanged hook", t); }
+                }
+            });
+
+            // Global Activity.onDestroy — cleanup when Dogfood is destroyed
+            XposedBridge.hookAllMethods(Activity.class, "onDestroy", new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam p) {
+                    try {
+                        Object thiz = p.thisObject;
+                        if (thiz == null || !dogfoodCls.isInstance(thiz)) return;
+                        Activity a = (Activity) thiz;
+
+                        try {
+                            Object rx = XposedHelpers.getAdditionalInstanceField(a, "QVSP_killRx");
+                            if (rx instanceof BroadcastReceiver) {
+                                a.unregisterReceiver((BroadcastReceiver) rx);
+                                Logx.debug("[IE] Kill receiver unregistered");
+                            }
+                        } catch (Throwable t) {
+                            Logx.exc("[IE] killRx unregister", t);
+                        }
+
+                        State.debugPanelMainView = null;
+                        State.lastDecor = null;
+                        State.lastActivity = null;
+                        State.inDogfoodStandalone = false;
+                    } catch (Throwable t) {
+                        Logx.exc("[IE] global onDestroy hook", t);
                     }
                 }
             });
 
-            // Dogfood onDestroy cleanup; avoid double finish side effects
-            try {
-                XposedHelpers.findAndHookMethod(
-                        DogfoodActivity, lpp.classLoader, "onDestroy",
-                        new XC_MethodHook() {
-                            @Override protected void beforeHookedMethod(MethodHookParam p) {
-                                State.debugPanelMainView = null;
-                                State.lastDecor = null;
-                                State.lastActivity = null;
-                                State.inDogfoodStandalone = false;
-                            }
-                        });
-            } catch (Throwable ignored) {}
+            Logx.debug("[IE] Global Activity hooks installed (focus/destroy filtered to Dogfood)");
 
-            Logx.debug("[IE] StandalonePanelHost installed");
         } catch (Throwable t) {
             Logx.exc("StandalonePanelHost.install failed", t);
-        }
-    }
-
-    private static void registerKillReceiver(final Activity dogfood) {
-        try {
-            IntentFilter f = new IntentFilter(ACTION_KILL_DOGFOOD);
-            dogfood.registerReceiver(new BroadcastReceiver() {
-                @Override public void onReceive(Context context, Intent intent) {
-                    try {
-                        if (!dogfood.isFinishing() && !dogfood.isDestroyed()) {
-                            dogfood.finish();
-                        }
-                    } catch (Throwable ignored) {}
-                }
-            }, f);
-        } catch (Throwable t) {
-            Logx.exc("[IE] registerKillReceiver", t);
         }
     }
 
@@ -182,9 +213,10 @@ public final class StandalonePanelHost {
         try {
             if (State.debugPanelCtor == null) return null;
 
+            Application app = activity.getApplication();
             Bundle bundle = (bundleArg instanceof Bundle) ? (Bundle) bundleArg : new Bundle();
 
-            // Tiny Surface to satisfy ctors expecting a Surface
+            // tiny Surface to satisfy Surface ctors
             SurfaceView sv = new SurfaceView(activity);
             if (activity.getWindow()!=null) {
                 View decor = activity.getWindow().getDecorView();
@@ -195,7 +227,7 @@ public final class StandalonePanelHost {
             Surface s = sv.getHolder().getSurface();
             if (s == null || !s.isValid()) {
                 SurfaceTexture st = new SurfaceTexture(0);
-                st.setDefaultBufferSize(64, 64);
+                st.setDefaultBufferSize(1024, 1024);
                 s = new Surface(st);
             }
 
@@ -205,7 +237,7 @@ public final class StandalonePanelHost {
             for (int i = 0; i < ps.length; i++) {
                 Class<?> p = ps[i];
                 args[i] =
-                        Application.class.isAssignableFrom(p) ? activity.getApplication() :
+                        Application.class.isAssignableFrom(p) ? app :
                         Activity.class.isAssignableFrom(p) || Context.class.isAssignableFrom(p) ? activity :
                         Bundle.class.isAssignableFrom(p) ? bundle :
                         Surface.class.isAssignableFrom(p) ? s :

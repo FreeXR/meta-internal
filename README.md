@@ -60,18 +60,14 @@ This panel contains advanced diagnostics and options normally reserved for inter
 
 ## Usage
 
-- After reboot, the **Internal Settings** debug panel will be revealed inside `vrshell`.
-- Look in Quick Settings or the main Settings app for a new **Internal** / **Debug** menu.
-- Explore sections like *Screenshot*, *Packages*, *Polaris*, *Events*, etc.
-- **Limitation:** Dropdowns and blue buttons currently do **not** function. Treat the menu as **read-only**.
+- After restarting vrshell, the **Internal Settings** debug panel will be accessible inside `VRShell Patcher` app , click the button to make dogfood app show the hidden settings.
+- **Limitation:** Dropdowns and blue buttons currently do **not** function. 
 
 ---
 
 ## Known Issues
 
 - Dropdown menus and blue buttons are non-functional.
-- Module hooks into system UI – expect possible crashes after system updates.
-- Future Quest firmware may move or disable the debug panel.
 
 ---
 
@@ -79,7 +75,6 @@ This panel contains advanced diagnostics and options normally reserved for inter
 
 - Rooting and modifying system apps may brick your device and void warranty.
 - This project is **not supported by Meta**.
-- Use at your own risk. Do not use to cheat, bypass DRM, or exploit services.
 
 ---
 
